@@ -16,8 +16,8 @@ const loadHeatmap = (filters = []) => {
                 map.removeLayer(heatmapLayer);
             }
             heatmapLayer = L.heatLayer(points, {
-                radius: 25,
-                blur: 15,
+                radius: 5,
+                blur: 1,
                 gradient: {0.4: 'blue', 0.6: 'cyan', 0.7: 'lime', 0.8: 'yellow', 1: 'red'}
             }).addTo(map);
         });
