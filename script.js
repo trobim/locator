@@ -3,23 +3,25 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: 'Map data © OpenStreetMap contributors'
 }).addTo(map);
 
-let heatmapLayer;
+let markersCluster;
 
-const loadHeatmap = (filters = []) => {
+const loadMarkers = (filters = []) => {
+    if (markersCluster) {
+        map.removeLayer(markersCluster); // Remove existing cluster group if any
+    }
+    markersCluster = L.markerClusterGroup();
+
     fetch('https://raw.githubusercontent.com/trobim/locator/main/data/schools.geojson')
         .then(response => response.json())
         .then(data => {
-            const points = data.features
-                .filter(feature => filters.length === 0 || filters.includes(feature.properties.amenity))
-                .map(feature => [feature.geometry.coordinates[1], feature.geometry.coordinates[0], 1]); // lat, lng, intensity
-            if (heatmapLayer) {
-                map.removeLayer(heatmapLayer);
-            }
-            heatmapLayer = L.heatLayer(points, {
-                radius: 15,
-                blur: 10,
-                gradient: {0.4: 'blue', 0.6: 'cyan', 0.7: 'lime', 0.8: 'yellow', 1: 'red'}
-            }).addTo(map);
+            data.features.forEach(feature => {
+                if (filters.length === 0 || filters.includes(feature.properties.amenity)) {
+                    const latlng = [feature.geometry.coordinates[1], feature.geometry.coordinates[0]];
+                    const marker = L.marker(latlng);
+                    markersCluster.addLayer(marker);
+                }
+            });
+            map.addLayer(markersCluster);
         });
 };
 
@@ -36,11 +38,9 @@ const populateFilterOptions = () => {
                 checkbox.value = amenity;
                 checkbox.id = `filter-${amenity}`;
                 checkbox.name = 'amenity';
-                
                 const label = document.createElement('label');
                 label.htmlFor = `filter-${amenity}`;
                 label.textContent = amenity;
-
                 wrapper.appendChild(checkbox);
                 wrapper.appendChild(label);
                 container.appendChild(wrapper);
@@ -52,9 +52,9 @@ const populateFilterOptions = () => {
 
 const handleFilterChange = () => {
     const selectedFilters = [...document.querySelectorAll('[name="amenity"]:checked')].map(input => input.value);
-    loadHeatmap(selectedFilters);
+    loadMarkers(selectedFilters);
 };
 
 // Initialize
-loadHeatmap();
 populateFilterOptions();
+loadMarkers(); // Load all markers initially
