@@ -3,24 +3,14 @@
 <head>
     <title>Locator Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <style>
-        #mapid { height: 100vh; }
-        .filter-container {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 1000;
-            background: white;
-            padding: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
     <div id="mapid"></div>
     <div class="filter-container">
         <select id="amenity-filter">
             <option value="">Select Amenity</option>
-            <!-- Dynamically populated -->
+            <!-- Options will be added dynamically -->
         </select>
     </div>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
