@@ -1,7 +1,7 @@
 {
     "type": "FeatureCollection",
     "name": "hotosm_che_education_facilities_points_geojson",
-    "features": [
+    "features":[
     { "type": "Feature", "properties": { "name": "ZHAW", "name:en": null, "amenity": "college", "building": null, "operator:type": null, "capacity:persons": null, "addr:full": null, "addr:city": null, "source": null, "name:fr": null, "name:de": "ZHAW", "name:it": null, "name:rm": null, "osm_id": 5011997130, "osm_type": "nodes" }, "geometry": { "type": "Point", "coordinates": [ 8.716004, 47.4934056 ] } },
     { "type": "Feature", "properties": { "name": "Kindergarten Schmittenacher", "name:en": null, "amenity": "kindergarten", "building": null, "operator:type": null, "capacity:persons": null, "addr:full": null, "addr:city": null, "source": null, "name:fr": null, "name:de": null, "name:it": null, "name:rm": null, "osm_id": 10006677711, "osm_type": "nodes" }, "geometry": { "type": "Point", "coordinates": [ 8.7665201, 47.4320814 ] } },
     { "type": "Feature", "properties": { "name": "Kindergarten Bachtobel", "name:en": null, "amenity": "kindergarten", "building": null, "operator:type": null, "capacity:persons": null, "addr:full": null, "addr:city": "Seuzach", "source": null, "name:fr": null, "name:de": null, "name:it": null, "name:rm": null, "osm_id": 9947071082, "osm_type": "nodes" }, "geometry": { "type": "Point", "coordinates": [ 8.7380225, 47.5375438 ] } },
