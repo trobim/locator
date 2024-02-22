@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
         attribution: 'Map data © OpenStreetMap contributors'
     }).addTo(map);
 
-    fetch('data/schools.geojson')
+    fetch('https://raw.githubusercontent.com/trobim/locator/main/data/schools.geojson')
         .then(response => response.json())
         .then(data => {
             L.geoJSON(data).addTo(map);
