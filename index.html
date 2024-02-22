@@ -3,22 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Cluster Areas Map</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <link rel="stylesheet" href="style.css" />
+    <title>Cluster Map with Dynamic Radius</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
+    <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
     <div id="mapid"></div>
     <div class="controls-container">
-        <div class="slider-container">
-            <input type="range" id="radius-slider" min="1000" max="20000" value="15000" step="1000">
-            <span>Cluster Radius: <span id="radius-value">15</span> km</span>
-        </div>
-        <div class="filter-container">
-            <!-- Checkboxes for filtering will be populated here -->
-        </div>
+        <label for="radius-slider">Cluster Radius: <span id="radius-value">1</span> km</label>
+        <input type="range" id="radius-slider" min="1000" max="5000" value="1000" step="100">
     </div>
-
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/@turf/turf"></script>
     <script src="script.js"></script>
