@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cluster Map with Dynamic Radius</title>
+    <title>Dynamic Clustering Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
     <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
     <div id="mapid"></div>
     <div class="controls-container">
-        <label for="radius-slider">Cluster Radius: <span id="radius-value">1</span> km</label>
-        <input type="range" id="radius-slider" min="1000" max="5000" value="1000" step="100">
+        <label for="radius-slider">Cluster Radius: <span id="radius-value">4</span> km</label>
+        <input type="range" id="radius-slider" min="100" max="15000" value="4000" step="100">
     </div>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/@turf/turf"></script>
