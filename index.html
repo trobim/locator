@@ -1,19 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Locator Cluster Map</title>
+    <title>Cluster Areas Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
-    <link rel="stylesheet" href="style.css" />
+    <style>
+        #mapid { height: 100vh; }
+    </style>
 </head>
 <body>
     <div id="mapid"></div>
-    <div class="filter-container" id="amenity-filter">
-        <!-- Checkboxes will be added dynamically -->
-    </div>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster-src.js"></script>
+    <script src="https://unpkg.com/@turf/turf"></script>
     <script src="script.js"></script>
 </body>
 </html>

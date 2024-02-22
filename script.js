@@ -1,60 +1,29 @@
-const map = L.map('mapid').setView([46.8182, 8.2275], 8);
+const map = L.map('mapid').setView([46.8182, 8.2275], 7); // Center on Switzerland for the demo
+
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: 'Map data © OpenStreetMap contributors'
 }).addTo(map);
 
-let markersCluster;
+// Generate some random points for demonstration purposes
+const points = turf.randomPoint(100, {bbox: [5.9559111595, 45.8180243, 10.4920501709, 47.8083802]}); // Bounding box around Switzerland
 
-const loadMarkers = (filters = []) => {
-    if (markersCluster) {
-        map.removeLayer(markersCluster); // Remove existing cluster group if any
+// Use Turf to cluster the points
+const clustered = turf.clustersDbscan(points, 15000, {units: 'meters'});
+
+// Calculate and draw the convex hull for each cluster
+clustered.features.forEach(feature => {
+    if (feature.properties.dbscan === "core") {
+        const clusterId = feature.properties.cluster;
+        const clusterPoints = clustered.features.filter(f => f.properties.cluster === clusterId);
+        const hull = turf.convex(turf.featureCollection(clusterPoints));
+        
+        if (hull) {
+            L.polygon(hull.geometry.coordinates[0].map(coord => [coord[1], coord[0]]), {
+                color: 'red',
+                weight: 2,
+                fillColor: '#f03',
+                fillOpacity: 0.5
+            }).addTo(map);
+        }
     }
-    markersCluster = L.markerClusterGroup();
-
-    fetch('https://raw.githubusercontent.com/trobim/locator/main/data/schools.geojson')
-        .then(response => response.json())
-        .then(data => {
-            data.features.forEach(feature => {
-                if (filters.length === 0 || filters.includes(feature.properties.amenity)) {
-                    const latlng = [feature.geometry.coordinates[1], feature.geometry.coordinates[0]];
-                    const marker = L.marker(latlng);
-                    markersCluster.addLayer(marker);
-                }
-            });
-            map.addLayer(markersCluster);
-        });
-};
-
-const populateFilterOptions = () => {
-    fetch('https://raw.githubusercontent.com/trobim/locator/main/data/schools.geojson')
-        .then(response => response.json())
-        .then(data => {
-            const amenities = [...new Set(data.features.map(feature => feature.properties.amenity))];
-            const container = document.getElementById('amenity-filter');
-            amenities.forEach(amenity => {
-                const wrapper = document.createElement('div');
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.value = amenity;
-                checkbox.id = `filter-${amenity}`;
-                checkbox.name = 'amenity';
-                const label = document.createElement('label');
-                label.htmlFor = `filter-${amenity}`;
-                label.textContent = amenity;
-                wrapper.appendChild(checkbox);
-                wrapper.appendChild(label);
-                container.appendChild(wrapper);
-
-                checkbox.addEventListener('change', handleFilterChange);
-            });
-        });
-};
-
-const handleFilterChange = () => {
-    const selectedFilters = [...document.querySelectorAll('[name="amenity"]:checked')].map(input => input.value);
-    loadMarkers(selectedFilters);
-};
-
-// Initialize
-populateFilterOptions();
-loadMarkers(); // Load all markers initially
+});
