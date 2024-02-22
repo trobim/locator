@@ -1,13 +1,10 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const map = L.map('mapid').setView([46.8182, 8.2275], 8); // Adjust center as needed
+    const map = L.map('mapid').setView([46.8182, 8.2275], 8);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: 'Map data © OpenStreetMap contributors'
     }).addTo(map);
 
-    const geojsonDataUrl = 'https://raw.githubusercontent.com/trobim/locator/main/data/schools.geojson';
-
-    // Fetch GeoJSON data with error handling
-    fetch(geojsonDataUrl)
+    fetch('https://raw.githubusercontent.com/trobim/locator/main/data/schools.geojson')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -15,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return response.json();
         })
         .then(data => {
-            console.log("GeoJSON data successfully fetched:", data); // Debugging log
+            console.log("GeoJSON data successfully fetched:", data);
             processGeoJson(data, 4000); // Initialize with 4 km radius
         })
         .catch(error => console.error("Error fetching GeoJSON data:", error));
@@ -23,18 +20,17 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('radius-slider').addEventListener('input', function() {
         const radius = parseInt(this.value, 10);
         document.getElementById('radius-value').textContent = (radius / 1000).toFixed(1); // Convert to km
-        console.log("Slider adjusted, new radius:", radius, "meters"); // Debugging log
+        console.log("Slider adjusted, new radius:", radius, "meters");
 
-        fetch(geojsonDataUrl)
+        fetch('https://raw.githubusercontent.com/trobim/locator/main/data/schools.geojson')
             .then(response => response.json())
             .then(data => {
-                processGeoJson(data, radius);
+                processGeoJson(data, radius); // Process with new radius
             })
             .catch(error => console.error("Error re-fetching GeoJSON data on slider adjustment:", error));
     });
 
     function processGeoJson(geojsonData, radius) {
-        // Clear existing map layers except for the base tile layer
         map.eachLayer(layer => {
             if (!(layer instanceof L.TileLayer)) {
                 map.removeLayer(layer);
@@ -43,43 +39,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const educationFeatures = geojsonData.features.filter(feature =>
             feature.properties.amenity === 'college' || feature.properties.amenity === 'school');
-        const universityFeatures = geojsonData.features.filter(feature =>
-            feature.properties.amenity === 'university');
-
-        console.log("Filtered education features:", educationFeatures.length); // Debugging log
-        console.log("Filtered university features:", universityFeatures.length); // Debugging log
 
         if (educationFeatures.length === 0) {
             console.log("No education features to cluster.");
+            console.log("All is good, but no features matched the criteria.");
             return;
         }
 
         const educationCollection = turf.featureCollection(educationFeatures);
-        const universityCollection = turf.featureCollection(universityFeatures);
-
+        
         const clustered = turf.clustersDbscan(educationCollection, radius / 1000, {units: 'kilometers'});
 
         clustered.features.forEach(cluster => {
             if (cluster.properties.cluster !== undefined) {
                 const clusterPoints = clustered.features.filter(f => f.properties.cluster === cluster.properties.cluster);
-                if (clusterPoints.length < 2) {
-                    console.log("Skipping cluster with fewer than 2 points, insufficient for a polygon.");
+                if (clusterPoints.length < 3) {
+                    console.log("Skipping cluster with fewer than 3 points, insufficient for a polygon.");
                     return;
                 }
 
                 const clusterFeature = turf.featureCollection(clusterPoints);
                 const hull = turf.convex(clusterFeature);
                 if (hull) {
-                    const nearestUniversity = turf.nearestPoint(turf.center(hull), universityCollection);
-                    const distance = turf.distance(turf.center(hull), nearestUniversity, {units: 'kilometers'}).toFixed(2);
                     L.polygon(hull.geometry.coordinates[0], {
                         color: 'blue',
                         weight: 2,
                         fillColor: '#f03',
                         fillOpacity: 0.5
-                    }).addTo(map).bindPopup(`Nearest University Distance: ${distance} km`);
+                    }).addTo(map).bindPopup(`Cluster with ${clusterPoints.length} points`);
                 }
             }
         });
+
+        console.log("All is good, processing completed successfully."); // Success log
     }
 });
