@@ -4,13 +4,13 @@
     width: 100vw;
 }
 
-/* Style for the filter container */
-.filter-container {
+/* Style for the control panel containing filters and radius slider */
+.controls-container {
     position: absolute;
     top: 10px;
     left: 10px;
     z-index: 1000;
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.9);
     padding: 10px;
     border-radius: 5px;
     box-shadow: 0 1px 5px rgba(0,0,0,0.4);
@@ -18,19 +18,28 @@
     overflow-y: auto;
 }
 
-/* Style for each filter option */
+/* Style for the slider container */
+.slider-container {
+    margin-bottom: 20px;
+}
+
+/* Style for the radius slider */
+#radius-slider {
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* Style adjustments for the filter checkboxes */
 .filter-container div {
     margin: 5px 0;
 }
 
-/* Style for filter labels */
 .filter-container label {
     margin-left: 5px;
     font-size: 14px;
     cursor: pointer;
 }
 
-/* Customizing the checkbox appearance slightly */
 .filter-container input[type="checkbox"] {
     cursor: pointer;
 }

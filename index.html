@@ -9,7 +9,15 @@
 </head>
 <body>
     <div id="mapid"></div>
-    <div class="filter-container"></div>
+    <div class="controls-container">
+        <div class="slider-container">
+            <input type="range" id="radius-slider" min="1000" max="20000" value="15000" step="1000">
+            <span>Cluster Radius: <span id="radius-value">15</span> km</span>
+        </div>
+        <div class="filter-container">
+            <!-- Checkboxes for filtering will be populated here -->
+        </div>
+    </div>
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/@turf/turf"></script>

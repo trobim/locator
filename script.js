@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }).addTo(map);
 
     let geojsonData; // To store fetched GeoJSON data
-    const maxAreaSize = 1000000; // Maximum area size in square meters (e.g., 1 km²)
 
     // Fetch and store GeoJSON data, then initialize the map and filters
     fetch('https://raw.githubusercontent.com/trobim/locator/main/data/schools.geojson')
@@ -13,7 +12,9 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(data => {
             geojsonData = data;
             populateFilterOptions(data);
-            updateMap(data); // Initial map update with all data
+            // Initialize with default values
+            const initialRadius = document.getElementById('radius-slider').value;
+            applyFilters(initialRadius);
         });
 
     function populateFilterOptions(data) {
@@ -25,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function () {
             checkbox.type = 'checkbox';
             checkbox.value = amenity;
             checkbox.id = `filter-${amenity}`;
-            checkbox.checked = true; // Start with all checked
+            checkbox.checked = true;
             const label = document.createElement('label');
             label.htmlFor = `filter-${amenity}`;
             label.textContent = amenity;
@@ -33,20 +34,23 @@ document.addEventListener('DOMContentLoaded', function () {
             wrapper.appendChild(label);
             container.appendChild(wrapper);
 
-            checkbox.addEventListener('change', applyFilters);
+            checkbox.addEventListener('change', () => {
+                const radius = document.getElementById('radius-slider').value;
+                applyFilters(radius);
+            });
         });
     }
 
-    function applyFilters() {
+    function applyFilters(radius) {
         const selectedAmenities = [...document.querySelectorAll('.filter-container input:checked')].map(input => input.value);
         const filteredData = {
             ...geojsonData,
             features: geojsonData.features.filter(feature => selectedAmenities.includes(feature.properties.amenity))
         };
-        updateMap(filteredData);
+        updateMap(filteredData, radius);
     }
 
-    function updateMap(data) {
+    function updateMap(data, radius) {
         // Clear existing layers
         map.eachLayer(function (layer) {
             if (!!layer.toGeoJSON) {
@@ -54,9 +58,12 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
+        // Adjust clustering logic to use the provided radius
         const points = turf.featureCollection(data.features);
-        const clustered = turf.clustersDbscan(points, 15000, {units: 'meters'});
+        const options = {units: 'meters', minPoints: 2};
+        const clustered = turf.clustersDbscan(points, parseInt(radius, 10), options);
 
+        // Draw clusters
         clustered.features.forEach(feature => {
             if (feature.properties.dbscan === "core") {
                 const clusterId = feature.properties.cluster;
@@ -64,17 +71,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 const hull = turf.convex(turf.featureCollection(clusterPoints));
 
                 if (hull) {
-                    const area = turf.area(hull);
-                    if (area <= maxAreaSize) { // Check if the area is within the limit
-                        L.polygon(hull.geometry.coordinates[0].map(coord => [coord[1], coord[0]]), {
-                            color: 'red',
-                            weight: 2,
-                            fillColor: '#f03',
-                            fillOpacity: 0.5
-                        }).addTo(map);
-                    }
+                    L.polygon(hull.geometry.coordinates[0].map(coord => [coord[1], coord[0]]), {
+                        color: 'red',
+                        weight: 2,
+                        fillColor: '#f03',
+                        fillOpacity: 0.5
+                    }).addTo(map);
                 }
             }
         });
     }
+
+    // Listen to radius slider changes
+    document.getElementById('radius-slider').addEventListener('input', function() {
+        const radius = this.value;
+        document.getElementById('radius-value').textContent = radius / 1000; // Convert to km for display
+        applyFilters(radius); // Re-apply filters using the new radius for clustering
+    });
 });
