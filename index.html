@@ -1,14 +1,16 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Cluster Areas Map</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Cluster Areas Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <style>
-        #mapid { height: 100vh; }
-    </style>
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
     <div id="mapid"></div>
+    <div class="filter-container"></div>
+
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/@turf/turf"></script>
     <script src="script.js"></script>
