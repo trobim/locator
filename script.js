@@ -5,12 +5,12 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 let heatmapLayer;
 
-const loadHeatmap = (filter = '') => {
+const loadHeatmap = (filters = []) => {
     fetch('https://raw.githubusercontent.com/trobim/locator/main/data/schools.geojson')
         .then(response => response.json())
         .then(data => {
             const points = data.features
-                .filter(feature => filter === '' || feature.properties.amenity === filter)
+                .filter(feature => filters.length === 0 || filters.includes(feature.properties.amenity))
                 .map(feature => [feature.geometry.coordinates[1], feature.geometry.coordinates[0], 1]); // lat, lng, intensity
             if (heatmapLayer) {
                 map.removeLayer(heatmapLayer);
@@ -28,19 +28,32 @@ const populateFilterOptions = () => {
         .then(response => response.json())
         .then(data => {
             const amenities = [...new Set(data.features.map(feature => feature.properties.amenity))];
-            const select = document.getElementById('amenity-filter');
+            const container = document.getElementById('amenity-filter');
             amenities.forEach(amenity => {
-                const option = document.createElement('option');
-                option.value = amenity;
-                option.textContent = amenity;
-                select.appendChild(option);
+                const wrapper = document.createElement('div');
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = amenity;
+                checkbox.id = `filter-${amenity}`;
+                checkbox.name = 'amenity';
+                
+                const label = document.createElement('label');
+                label.htmlFor = `filter-${amenity}`;
+                label.textContent = amenity;
+
+                wrapper.appendChild(checkbox);
+                wrapper.appendChild(label);
+                container.appendChild(wrapper);
+
+                checkbox.addEventListener('change', handleFilterChange);
             });
         });
 };
 
-document.getElementById('amenity-filter').addEventListener('change', (event) => {
-    loadHeatmap(event.target.value);
-});
+const handleFilterChange = () => {
+    const selectedFilters = [...document.querySelectorAll('[name="amenity"]:checked')].map(input => input.value);
+    loadHeatmap(selectedFilters);
+};
 
 // Initialize
 loadHeatmap();
